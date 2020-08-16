@@ -1,5 +1,10 @@
 plugins {
     id 'java'
+    id 'idea'
+    id myPlugin1 as String
+
+//    id 'org.springframework.boot' version '2.1.7.RELEASE'
+
 }
 
 group 'org.example'
@@ -13,5 +18,69 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'com.google.guava:guava:29.0-jre'
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-gradle-plugin:2.1.7.RELEASE'
 }
+
+
+//configurations.runtime.each { File f -> println f }
+task print1() {
+    doFirst {
+        task hello
+        println tasks.hello.name
+        println hello.name
+        println tasks.getByPath("hello").path
+
+        //gradle调用方法时，小括号可有可无
+        println(name)
+        println project.name
+        println project
+    }
+}
+
+
+task myCopy(type: Copy) {
+    from 'C:\\Users\\duoyi\\Desktop\\aa'
+    into 'C:\\Users\\duoyi\\Desktop\\bb'
+    include('**/*.txt', '**/*.docx')
+}
+
+task x() {
+//    println 'x在配置阶段执行的代码'
+
+    doLast {
+        println("x的action1")
+    }
+}
+task y() {
+    //在配置阶段执行
+//    println '在配置阶段执行的代码'
+
+    //将任务添加到action中
+    doLast {
+        //在任务执行阶段执行
+        println('y的action1')
+    }
+}
+
+task z() {
+    doLast {
+        println("z的action1")
+    }
+}
+
+x.dependsOn y
+x.finalizedBy z
+z.enabled=false
+
+//实现自定义插件
+class myPlugin1 implements Plugin<Project> {
+
+    @Override
+    void apply(Project project) {
+        println("这是我的插件1")
+        project.task('task1', {
+            println("这是插件1的task1任务的输出内容")
+        })
+    }
+}
+
